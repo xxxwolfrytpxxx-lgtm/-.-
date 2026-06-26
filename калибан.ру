@@ -1,0 +1,78 @@
+#ВНИМАНИЕ! Необходима версия 3.14 и библиотека keyboard. при смене управления нельзя убирать (VK_)
+#код был создан с помощью ИИ и отредактирован до рабочего состояния
+import time
+import ctypes
+
+blocked = False
+lmb_was_pressed = False
+num5_was_pressed = False
+
+VK_LBUTTON = 0x01
+VK_NUMPAD2 = 0x62
+VK_NUMPAD5 = 0x65
+VK_NUMPAD8 = 0x68
+VK_RETURN = 0x0D
+VK_SHIFT = 0x10
+
+VK_D = 0x44  # В
+VK_S = 0x53  # Ы
+VK_C = 0x43  # С
+VK_N = 0x4E  # Т
+VK_H = 0x48  # Р
+VK_T = 0x54  # Е
+VK_K = 0x4B  # Л
+VK_1 = 0x31  # !
+
+def is_key_pressed(vk_code):
+    return ctypes.windll.user32.GetAsyncKeyState(vk_code) & 0x8000 != 0
+
+def press_key(vk_code):
+    ctypes.windll.user32.keybd_event(vk_code, 0, 0, 0)
+    time.sleep(0.01)
+    ctypes.windll.user32.keybd_event(vk_code, 0, 2, 0)
+#используемые буквы на английской раскладке, текст зависит от выбранного языка для ввода
+def type_vistrel():
+    press_key(VK_D)   # В
+    press_key(VK_S)   # Ы
+    press_key(VK_C)   # С
+    press_key(VK_N)   # Т
+    press_key(VK_H)   # Р
+    press_key(VK_T)   # Е
+    press_key(VK_K)   # Л
+    # !
+    ctypes.windll.user32.keybd_event(VK_SHIFT, 0, 0, 0)
+    time.sleep(0.01)
+    press_key(VK_1)
+    time.sleep(0.01)
+    ctypes.windll.user32.keybd_event(VK_SHIFT, 0, 2, 0)
+#можно изменить управления
+print("СКРИПТ ГОТОВ. ЛКМ — ВЫСТРЕЛ! + NUM8. NUM5 — БЛОКИРОВКА.")
+
+while True:
+    lmb_pressed = is_key_pressed(VK_LBUTTON)
+    
+    if lmb_pressed and not lmb_was_pressed and not blocked:
+        # Чат
+        press_key(VK_NUMPAD2)#можно изменить клавишу ввода чата
+        time.sleep(0.1)
+        # ВЫСТРЕЛ!
+        type_vistrel()
+        time.sleep(0.05)
+        # Enter
+        press_key(VK_RETURN)
+        time.sleep(0.05)
+        # Выстрел
+        press_key(VK_NUMPAD8)#можно изменить клавишу выстрела
+        time.sleep(0.2)
+    
+    lmb_was_pressed = lmb_pressed
+    
+    # Num5 можно изменить, это блокировщик скрипта
+    num5_pressed = is_key_pressed(VK_NUMPAD5)
+    if num5_pressed and not num5_was_pressed:
+        blocked = not blocked
+        print("ЗАБЛОКИРОВАН" if blocked else "РАЗБЛОКИРОВАН")
+        time.sleep(0.3)
+    num5_was_pressed = num5_pressed
+    
+    time.sleep(0.01)
